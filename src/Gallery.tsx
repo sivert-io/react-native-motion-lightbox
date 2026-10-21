@@ -14,7 +14,7 @@ import Animated, { useAnimatedStyle, type SharedValue } from 'react-native-reani
 import { scheduleOnRN } from 'react-native-worklets'
 import { cropOf, fitIn } from './crop'
 import { DEFAULT_COLORS, DEFAULT_LABELS, Lightbox, useNaturalSizes } from './Lightbox'
-import { GAP, useTrack } from './track'
+import { GAP, offsetOf, useTrack, wrap as loop } from './track'
 import type { Crop, LightboxItem, LightboxProps, Rect } from './types'
 
 export interface GalleryProps<T extends LightboxItem = LightboxItem>
@@ -153,7 +153,9 @@ export function Gallery<T extends LightboxItem>({
     else if (name === 'longpress') longPress()
   }
 
-  const window = [index - 1, index, index + 1].filter((i) => i >= 0 && i < n)
+  // The current picture and its neighbours, round the loop; with a peek, the
+  // one after next too, so it's there as the next one slides in.
+  const window = [...new Set([index - 1, index, index + 1, ...(peek > 0 ? [index + 2] : [])].map((i) => loop(i, n)))]
   const item = items[index]
 
   return (
@@ -187,6 +189,7 @@ export function Gallery<T extends LightboxItem>({
                 key={i}
                 item={items[i]}
                 i={i}
+                n={n}
                 x={x}
                 step={step}
                 width={slideWidth}
@@ -248,6 +251,7 @@ function wrap(node: ReactNode, color: string) {
 function Slide({
   item,
   i,
+  n,
   x,
   step,
   width,
@@ -259,6 +263,7 @@ function Slide({
 }: {
   item: LightboxItem
   i: number
+  n: number
   x: SharedValue<number>
   step: number
   width: number
@@ -268,7 +273,7 @@ function Slide({
   crop?: Crop
   video?: ReactNode
 }) {
-  const along = useAnimatedStyle(() => ({ transform: [{ translateX: x.value + i * step }] }))
+  const along = useAnimatedStyle(() => ({ transform: [{ translateX: offsetOf(i, -x.value / (step || 1), n) * step }] }))
   const uri = item.kind === 'image' ? item.src : (item.poster ?? item.src)
   return (
     <Animated.View style={[styles.slide, { width, height, borderRadius: radius, backgroundColor: background }, along]}>

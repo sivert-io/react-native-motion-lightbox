@@ -9,17 +9,32 @@ export const GAP = 12
 // Eased at both ends for a move asked for (an arrow, autoplay, a thumbnail).
 // A released drag springs instead, carrying on at the speed the finger let go at.
 const GLIDE = { duration: 560, easing: Easing.bezier(0.65, 0, 0.35, 1) }
-const SPRING = { stiffness: 260, damping: 34 }
+// Mass 1, as in Motion: Reanimated fills in 4 when it's left out, and the
+// same stiffness and damping then bounce.
+const SPRING = { stiffness: 260, damping: 34, mass: 1 }
+
+/** `i` wrapped into 0..n. */
+export const wrap = (i: number, n: number) => {
+  'worklet'
+  return ((i % n) + n) % n
+}
+/** How far picture `i` is from track position `pos`, the shorter way round: -n/2 to n/2. */
+export const offsetOf = (i: number, pos: number, n: number) => {
+  'worklet'
+  const d = i - pos
+  return n > 1 ? d - n * Math.round(d / n) : d
+}
 
 /**
  * A row of pictures, one `step` apart, that moves as one: drag it, flick it,
  * grab it mid-glide. Shared by the gallery and the lightbox.
  *
- * Positions are absolute: picture `i` sits at `i * step + x`, so the current
- * one is in place when `x` is `-index * step`. The web package re-bases `x` on
- * every picture instead, and a picture joining mid-move kept missing that.
- * It doesn't wrap round from the last picture to the first, as photo apps on
- * a phone don't.
+ * `x` is how far the track has moved, unbounded: its position is `-x / step`
+ * pictures along, and it loops, so after the last picture comes the first,
+ * as on the web. Each picture is drawn at its distance from that position the
+ * shorter way round (`offsetOf`). Positions are absolute, not re-based on
+ * every picture as the web package's are, so a picture joining mid-move is
+ * never out of step.
  */
 export function useTrack({ count, step, start = 0 }: { count: number; step: number; start?: number }) {
   const [index, setIndex] = useState(start)
@@ -38,16 +53,21 @@ export function useTrack({ count, step, start = 0 }: { count: number; step: numb
     x.value = -latest.current.index * step
   }, [step, x])
 
+  /** Where the track is now, in whole pictures along it (not wrapped). */
+  const here = () => Math.round(-x.value / (latest.current.step || 1))
+
   /**
-   * To a picture: a glide to a neighbour, straight there for one further
-   * away (only the neighbours are drawn, so a long glide would pass through
-   * nothing) or with reduced motion.
+   * To a picture, the shorter way round: a glide to a neighbour, straight
+   * there for one further away (only the neighbours are drawn, so a long
+   * glide would pass through nothing) or with reduced motion.
    */
   const show = (to: number) => {
-    const { index, step, count, reduced } = latest.current
-    const target = Math.max(0, Math.min(count - 1, to))
-    setIndex(target)
-    if (reduced || Math.abs(target - index) > 1) {
+    const { step, count, reduced } = latest.current
+    const at = here()
+    const delta = offsetOf(wrap(to, count), wrap(at, count), count)
+    const target = at + delta
+    setIndex(wrap(target, count))
+    if (reduced || Math.abs(delta) > 1) {
       cancelAnimation(x)
       x.value = -target * step
     } else {
@@ -57,15 +77,16 @@ export function useTrack({ count, step, start = 0 }: { count: number; step: numb
   const go = (dir: 1 | -1) => show(latest.current.index + dir)
   /** Straight to a picture, no move: the gallery landing where the lightbox closed. */
   const jump = (to: number) => {
+    const { step, count } = latest.current
+    const at = here()
     cancelAnimation(x)
-    x.value = -to * latest.current.step
-    setIndex(to)
+    x.value = -(at + offsetOf(wrap(to, count), wrap(at, count), count)) * step
+    setIndex(wrap(to, count))
   }
 
   // On the UI thread, for gestures. A drag takes the track over wherever it
-  // is; past either end it gives a third as much. Let go, and it lands on the
-  // picture it would coast to at that speed.
-  const max = (count - 1) * step
+  // is. Let go, and it lands on the neighbour it would coast to at that speed,
+  // with the web package's spring and coast.
   const begin = () => {
     'worklet'
     cancelAnimation(x)
@@ -73,18 +94,20 @@ export function useTrack({ count, step, start = 0 }: { count: number; step: numb
   }
   const move = (dx: number) => {
     'worklet'
-    const at = from.value + dx
-    x.value = at > 0 ? at / 3 : at < -max ? -max + (at + max) / 3 : at
+    // One picture can't loop round onto itself.
+    if (count < 2) return
+    x.value = from.value + dx
   }
   const settle = (velocity: number) => {
     'worklet'
-    // One picture at most: only the neighbours are drawn.
-    const coast = step ? Math.round(-(x.value + velocity * 0.2) / step) : index
-    const target = Math.max(0, Math.min(count - 1, Math.max(index - 1, Math.min(index + 1, coast))))
+    if (!step) return
+    const at = Math.round(-from.value / step)
+    // One picture at most either way: only the neighbours are drawn.
+    const coast = Math.round(-(x.value + velocity * 0.25) / step)
+    const target = count < 2 ? at : Math.max(at - 1, Math.min(at + 1, coast))
     x.value = reduced ? -target * step : withSpring(-target * step, { ...SPRING, velocity })
-    scheduleOnRN(setIndex, target)
+    scheduleOnRN(setIndex, wrap(target, count))
   }
-
   // Sideways only: a mostly vertical move fails it, so the screen around a
   // gallery still scrolls when a swipe starts on it.
   const pan = useMemo(

@@ -24,7 +24,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { fitIn } from './crop'
-import { GAP, useTrack } from './track'
+import { GAP, offsetOf, useTrack, wrap as loop } from './track'
 import type { Crop, LightboxColors, LightboxItem, LightboxLabels, LightboxProps, Rect } from './types'
 
 // ── Defaults ────────────────────────────────────────────────────────────────
@@ -56,7 +56,8 @@ const THUMB = 48
 /** A drag down this far, or flicked this fast, closes it. */
 const DISMISS = 120
 const DISMISS_SPEED = 900
-const SPRING = { stiffness: 380, damping: 36 }
+// Mass 1, as in Motion: Reanimated fills in 4 when it's left out.
+const SPRING = { stiffness: 380, damping: 36, mass: 1 }
 
 /** Each item's size: its own, or measured once it loads. */
 export function useNaturalSizes(items: LightboxItem[]) {
@@ -352,14 +353,21 @@ function Viewer<T extends LightboxItem>({
       if (zs.value < 1.02) zoomAround(1, centre.x, centre.y, zs.value, zx.value, zy.value, true)
     })
 
+  // A finger that moves more than 10pt is a swipe, never a tap: without the
+  // limit, every swipe between pictures also toggled the bars.
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
+    .maxDistance(10)
     .onEnd((e) => {
       const s = zs.value > 1.01 ? 1 : Math.min(2.5, maxZoom)
       zoomAround(s, e.x, e.y, zs.value, zx.value, zy.value, !reduced)
     })
   const toggleBars = () => setChrome((c) => !c)
-  const singleTap = Gesture.Tap().onEnd(() => scheduleOnRN(toggleBars))
+  const singleTap = Gesture.Tap()
+    .maxDistance(10)
+    .onEnd((_e, success) => {
+      if (success) scheduleOnRN(toggleBars)
+    })
   const gestures = Gesture.Simultaneous(pinch, pan, Gesture.Exclusive(doubleTap, singleTap))
   for (const g of [pinch, pan, doubleTap, singleTap]) g.enabled(!moving)
 
@@ -380,7 +388,7 @@ function Viewer<T extends LightboxItem>({
     else if (name === 'escape') onClose()
   }
 
-  const window = [index - 1, index, index + 1].filter((i) => i >= 0 && i < n)
+  const window = [...new Set([index - 1, index, index + 1].map((i) => loop(i, n)))]
 
   return (
     <View style={styles.fill} accessibilityViewIsModal accessibilityLabel={labels.dialog}>
@@ -405,6 +413,7 @@ function Viewer<T extends LightboxItem>({
               key={i}
               item={items[i]}
               i={i}
+              n={n}
               current={i === index}
               rect={fitted(i)}
               step={W + 2 * GAP}
@@ -469,6 +478,7 @@ function wrap(node: ReactNode, color: string) {
 function Picture<T extends LightboxItem>({
   item,
   i,
+  n,
   current,
   rect,
   step,
@@ -485,6 +495,7 @@ function Picture<T extends LightboxItem>({
 }: {
   item: T
   i: number
+  n: number
   current: boolean
   rect: Rect
   step: number
@@ -500,7 +511,7 @@ function Picture<T extends LightboxItem>({
   renderVideo?: (item: T, state: { active: boolean }) => ReactNode
 }) {
   const box = useAnimatedStyle(() => {
-    const along = x.value + i * step
+    const along = offsetOf(i, -x.value / (step || 1), n) * step
     if (!current) return { left: rect.x + along, top: rect.y, width: rect.width, height: rect.height, opacity: Number(ready) }
     const o = from.value ?? rect
     const q = p.value

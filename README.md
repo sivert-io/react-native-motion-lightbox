@@ -39,7 +39,8 @@ It's the phone version of [react-motion-lightbox](https://github.com/sivert-io/r
 ## What it does
 
 - Opens out of the picture you tapped, measured on screen. Without one, it fades in.
-- Swipe between pictures. You can flick them, and grab one while it's still moving.
+- Swipe between pictures. You can flick them, and grab one while it's still moving. After the last picture comes the first again.
+- The motion matches the web version: the same glide and the same spring.
 - Pinch to zoom, up to 8x, and pan around while zoomed in. Double-tap zooms in on that spot, or back out.
 - Swipe down to close. The picture shrinks a little and the background fades as you drag.
 - Android's back button closes it, and so does VoiceOver's escape gesture.
