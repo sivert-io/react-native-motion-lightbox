@@ -25,8 +25,8 @@ It's the phone version of [react-motion-lightbox](https://github.com/sivert-io/r
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/message.webp" alt="A message with four photos: the lighthouse is showing, and the edge of the next photo peeks in at the right"></td>
-    <td width="50%"><img src="docs/lightbox.webp" alt="The lightbox open on the lighthouse, with the caption, the count and the thumbnail row underneath"></td>
+    <td width="50%" valign="top"><img src="docs/message.webp" alt="A message with four photos: the lighthouse is showing, and the edge of the next photo peeks in at the right"></td>
+    <td width="50%" valign="top"><img src="docs/lightbox.webp" alt="The lightbox open on the lighthouse, with the caption, the count and the thumbnail row underneath"></td>
   </tr>
   <tr>
     <td align="center">In a chat message</td>
