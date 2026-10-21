@@ -1,12 +1,38 @@
-<img src="docs/logo.svg" width="72" height="72" alt="">
+<p align="center">
+  <img src="docs/logo.svg" width="88" height="88" alt="">
+</p>
 
-# react-native-motion-lightbox
+<h1 align="center">react-native-motion-lightbox</h1>
 
-A lightbox for React Native. It opens out of the picture you tapped and closes back into it.
+<p align="center">A lightbox for React Native. It opens out of the picture you tapped and closes back into it.</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/react-native-motion-lightbox"><img src="https://img.shields.io/npm/v/react-native-motion-lightbox?style=flat-square&color=9d4642" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/react-native-motion-lightbox"><img src="https://img.shields.io/npm/dm/react-native-motion-lightbox?style=flat-square&color=9d4642" alt="Downloads a month"></a>
+  <a href="https://github.com/sivert-io/react-native-motion-lightbox/stargazers"><img src="https://img.shields.io/github/stars/sivert-io/react-native-motion-lightbox?style=flat-square&color=9d4642" alt="GitHub stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/npm/l/react-native-motion-lightbox?style=flat-square&color=9d4642" alt="MIT licence"></a>
+</p>
+
+<p align="center">
+  <a href="#install">Install</a> ·
+  <a href="#gallery">Gallery</a> ·
+  <a href="#props">Props</a> ·
+  <a href="#try-it">Example app</a> ·
+  <a href="https://github.com/sivert-io/react-motion-lightbox">Web version</a>
+</p>
 
 It's the phone version of [react-motion-lightbox](https://github.com/sivert-io/react-motion-lightbox), which I built for my own site and for [Gryt](https://gryt.chat). Gryt's phone app is the first one to use this. The props have the same names wherever that made sense, so if you know one you know the other.
 
-![A message with four photos: the lighthouse is showing, and the edge of the next photo peeks in at the right](docs/message.webp) ![The lightbox open on the lighthouse, with the caption, the count and the thumbnail row underneath](docs/lightbox.webp)
+<table>
+  <tr>
+    <td width="50%"><img src="docs/message.webp" alt="A message with four photos: the lighthouse is showing, and the edge of the next photo peeks in at the right"></td>
+    <td width="50%"><img src="docs/lightbox.webp" alt="The lightbox open on the lighthouse, with the caption, the count and the thumbnail row underneath"></td>
+  </tr>
+  <tr>
+    <td align="center">In a chat message</td>
+    <td align="center">Open</td>
+  </tr>
+</table>
 
 ## What it does
 
