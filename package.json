@@ -1,23 +1,35 @@
 {
   "name": "react-native-motion-lightbox",
   "version": "0.1.0",
-  "description": "A React Native lightbox that opens out of the picture you tapped and closes back into it, and a small gallery for a chat message or a feed.",
+  "description": "A React Native lightbox and image gallery that opens out of the photo you tap and closes back into it: swipe, pinch zoom, swipe down to close, thumbnails, video. Reanimated and Gesture Handler, works with Expo.",
   "license": "MIT",
   "author": "Sivert Gullberg Hansen (https://gullberg.no)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sivert-io/react-native-motion-lightbox.git"
   },
-  "homepage": "https://github.com/sivert-io/react-native-motion-lightbox#readme",
+  "homepage": "https://lightbox.gullberg.no/#native",
   "bugs": "https://github.com/sivert-io/react-native-motion-lightbox/issues",
   "keywords": [
     "react-native",
+    "expo",
     "lightbox",
+    "react-native-lightbox",
     "gallery",
+    "image-gallery",
+    "photo-gallery",
     "image-viewer",
+    "carousel",
+    "zoom",
+    "pinch-zoom",
+    "swipe",
     "reanimated",
     "gesture-handler",
-    "pinch-zoom"
+    "thumbnails",
+    "ios",
+    "android",
+    "typescript",
+    "react-native-component"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

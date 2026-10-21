@@ -200,6 +200,9 @@ function Viewer<T extends LightboxItem>({
   const from = useSharedValue<Rect | null>(null)
   const crop = useSharedValue<Crop>(WHOLE)
   const [ready, setReady] = useState(false)
+  // True while the picture moves in or out. Every gesture and button waits:
+  // one mid-move fought the move for the picture.
+  const [moving, setMoving] = useState(true)
 
   useEffect(() => {
     let live = true
@@ -211,12 +214,13 @@ function Viewer<T extends LightboxItem>({
         crop.value = originCrop?.(start) ?? WHOLE
         p.value = 0
         setReady(true)
-        p.value = withTiming(1, { duration: OPEN, easing: EASE_OUT })
+        p.value = withTiming(1, { duration: OPEN, easing: EASE_OUT }, (finished) => finished && scheduleOnRN(setMoving, false))
       } else {
         p.value = 1
         fade.value = reduced ? 1 : 0
         setReady(true)
-        if (!reduced) fade.value = withTiming(1, { duration: FADE })
+        if (reduced) setMoving(false)
+        else fade.value = withTiming(1, { duration: FADE }, (finished) => finished && scheduleOnRN(setMoving, false))
       }
     })()
     return () => {
@@ -239,6 +243,7 @@ function Viewer<T extends LightboxItem>({
 
   useEffect(() => {
     if (!closing) return
+    setMoving(true)
     let live = true
     const done = () => onDone(index)
     void (async () => {
@@ -356,6 +361,7 @@ function Viewer<T extends LightboxItem>({
   const toggleBars = () => setChrome((c) => !c)
   const singleTap = Gesture.Tap().onEnd(() => scheduleOnRN(toggleBars))
   const gestures = Gesture.Simultaneous(pinch, pan, Gesture.Exclusive(doubleTap, singleTap))
+  for (const g of [pinch, pan, doubleTap, singleTap]) g.enabled(!moving)
 
   // ── Styles that move ─────────────────────────────────────────────────────
   // The backdrop, and with it the bars, fade as the picture is dragged down.
@@ -368,6 +374,7 @@ function Viewer<T extends LightboxItem>({
 
   const onAction = (event: AccessibilityActionEvent) => {
     const name = event.nativeEvent.actionName
+    if (moving) return
     if (name === 'increment') track.go(1)
     else if (name === 'decrement') track.go(-1)
     else if (name === 'escape') onClose()
@@ -423,6 +430,7 @@ function Viewer<T extends LightboxItem>({
           accessibilityRole="button"
           accessibilityLabel={labels.close}
           onPress={onClose}
+          disabled={moving}
           hitSlop={8}
           style={({ pressed }) => [styles.button, { borderColor: pressed ? colors.frame : 'rgba(255,255,255,0.25)' }]}
         >

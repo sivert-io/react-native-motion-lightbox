@@ -1,25 +1,27 @@
 <p align="center">
-  <img src="docs/logo.svg" width="88" height="88" alt="">
+  <a href="https://lightbox.gullberg.no/#native">
+    <img src="docs/banner.webp" width="100%" alt="react-native-motion-lightbox: a lightbox for React Native that opens out of the photo you tap. A photo of a cliff with a square drawn around the person standing on it.">
+  </a>
 </p>
-
-<h1 align="center">react-native-motion-lightbox</h1>
-
-<p align="center">A lightbox for React Native. It opens out of the picture you tapped and closes back into it.</p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/react-native-motion-lightbox"><img src="https://img.shields.io/npm/v/react-native-motion-lightbox?style=flat-square&color=9d4642" alt="npm version"></a>
   <a href="https://www.npmjs.com/package/react-native-motion-lightbox"><img src="https://img.shields.io/npm/dm/react-native-motion-lightbox?style=flat-square&color=9d4642" alt="Downloads a month"></a>
+  <a href="src/index.ts"><img src="https://img.shields.io/badge/types-included-9d4642?style=flat-square" alt="TypeScript types included"></a>
   <a href="https://github.com/sivert-io/react-native-motion-lightbox/stargazers"><img src="https://img.shields.io/github/stars/sivert-io/react-native-motion-lightbox?style=flat-square&color=9d4642" alt="GitHub stars"></a>
   <a href="LICENSE"><img src="https://img.shields.io/npm/l/react-native-motion-lightbox?style=flat-square&color=9d4642" alt="MIT licence"></a>
 </p>
 
 <p align="center">
+  <a href="https://lightbox.gullberg.no/#native"><b>See it</b></a> ·
   <a href="#install">Install</a> ·
   <a href="#gallery">Gallery</a> ·
   <a href="#props">Props</a> ·
-  <a href="#try-it">Example app</a> ·
+  <a href="#theming">Theming</a> ·
   <a href="https://github.com/sivert-io/react-motion-lightbox">Web version</a>
 </p>
+
+A lightbox for React Native. It opens out of the picture you tapped and closes back into it. iOS and Android, with or without Expo.
 
 It's the phone version of [react-motion-lightbox](https://github.com/sivert-io/react-motion-lightbox), which I built for my own site and for [Gryt](https://gryt.chat). Gryt's phone app is the first one to use this. The props have the same names wherever that made sense, so if you know one you know the other.
 
@@ -136,10 +138,29 @@ const origin = (i: number) =>
 | `radius` | Corner radius in points. It stays the same all the way through the opening move. Default `12`. |
 | `labels` | `{ dialog, close, previous, next, pause, play }`, for screen readers and other languages. |
 | `icons` | `{ close, pause, play }`, any React node. |
-| `colors` | `{ backdrop, color, muted, frame, slide }`. `frame` is the border round the current thumbnail, and `slide` sits behind each picture in a gallery. |
+| `colors` | `{ backdrop, color, muted, frame, slide }`. See [Theming](#theming). |
 | `insets` | `{ top, bottom }`: room for the status bar and the home indicator. Pass your safe area insets. Without them it guesses. |
 
 `cropOf(item, aspect)` gives you the same crop a gallery uses, and `useTrack` is the track both move on, if you build something of your own.
+
+## Theming
+
+There's no stylesheet. Pass `colors` to either component:
+
+```tsx
+<Gallery
+  items={items}
+  colors={{
+    backdrop: 'rgba(0, 0, 0, 0.94)', // behind the open lightbox
+    color: '#f4f4f5',                // titles and buttons
+    muted: '#a1a1aa',                // captions and the count
+    frame: '#e0b04a',                // round the current thumbnail
+    slide: 'rgba(127, 127, 127, 0.16)', // behind each picture in a gallery
+  }}
+/>
+```
+
+Those are the defaults. `icons` and `radius` change the rest.
 
 ## Try it
 
