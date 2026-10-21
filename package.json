@@ -1,0 +1,61 @@
+{
+  "name": "react-native-motion-lightbox",
+  "version": "0.1.0",
+  "description": "A React Native lightbox that opens out of the picture you tapped and closes back into it, and a small gallery for a chat message or a feed.",
+  "license": "MIT",
+  "author": "Sivert Gullberg Hansen (https://gullberg.no)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sivert-io/react-native-motion-lightbox.git"
+  },
+  "homepage": "https://github.com/sivert-io/react-native-motion-lightbox#readme",
+  "bugs": "https://github.com/sivert-io/react-native-motion-lightbox/issues",
+  "keywords": [
+    "react-native",
+    "lightbox",
+    "gallery",
+    "image-viewer",
+    "reanimated",
+    "gesture-handler",
+    "pinch-zoom"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-native": ">=0.83",
+    "react-native-gesture-handler": ">=2.32.0 <3",
+    "react-native-reanimated": ">=4.5.0 <5",
+    "react-native-worklets": ">=0.10.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-worklets": "0.10.1",
+    "typescript": "~6.0.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

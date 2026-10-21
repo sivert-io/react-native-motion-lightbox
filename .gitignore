@@ -1,0 +1,7 @@
+node_modules
+dist
+*.tgz
+.DS_Store
+example/.expo
+example/ios
+example/android
