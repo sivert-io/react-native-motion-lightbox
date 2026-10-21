@@ -1,6 +1,6 @@
 {
   "name": "react-native-motion-lightbox",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A React Native lightbox and image gallery that opens out of the photo you tap and closes back into it: swipe, pinch zoom, swipe down to close, thumbnails, video. Reanimated and Gesture Handler, works with Expo.",
   "license": "MIT",
   "author": "Sivert Gullberg Hansen (https://gullberg.no)",
