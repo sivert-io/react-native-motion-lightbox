@@ -154,8 +154,10 @@ export function Gallery<T extends LightboxItem>({
   }
 
   // The current picture and its neighbours, round the loop; with a peek, the
-  // one after next too, so it's there as the next one slides in.
+  // one after next too, so it's there as the next one slides in. With two,
+  // that's the one on the other side as well, so each is drawn twice.
   const window = [...new Set([index - 1, index, index + 1, ...(peek > 0 ? [index + 2] : [])].map((i) => loop(i, n)))]
+  const slides = [...window.map((i) => ({ i, copy: false })), ...(n === 2 && peek > 0 ? window.map((i) => ({ i, copy: true })) : [])]
   const item = items[index]
 
   return (
@@ -184,12 +186,13 @@ export function Gallery<T extends LightboxItem>({
           onAccessibilityAction={onAction}
         >
           {width > 0 &&
-            window.map((i) => (
+            slides.map(({ i, copy }) => (
               <Slide
-                key={i}
+                key={copy ? `${i}:copy` : i}
                 item={items[i]}
                 i={i}
                 n={n}
+                copy={copy}
                 x={x}
                 step={step}
                 width={slideWidth}
@@ -260,10 +263,13 @@ function Slide({
   background,
   crop,
   video,
+  copy,
 }: {
   item: LightboxItem
   i: number
   n: number
+  /** Drawn a whole loop away, on the other side of the box. */
+  copy: boolean
   x: SharedValue<number>
   step: number
   width: number
@@ -273,7 +279,10 @@ function Slide({
   crop?: Crop
   video?: ReactNode
 }) {
-  const along = useAnimatedStyle(() => ({ transform: [{ translateX: offsetOf(i, -x.value / (step || 1), n) * step }] }))
+  const along = useAnimatedStyle(() => {
+    const at = offsetOf(i, -x.value / (step || 1), n)
+    return { transform: [{ translateX: (copy ? at - Math.sign(at || 1) * n : at) * step }] }
+  })
   const uri = item.kind === 'image' ? item.src : (item.poster ?? item.src)
   return (
     <Animated.View style={[styles.slide, { width, height, borderRadius: radius, backgroundColor: background }, along]}>
