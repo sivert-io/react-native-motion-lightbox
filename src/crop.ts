@@ -13,9 +13,9 @@ export function cropOf({ width = 1, height = 1, focus = [0.5, 0.5], zoom = 1 }: 
   return [clamp(focus[0], w), clamp(focus[1], h), w, h]
 }
 
-/** Where a picture of `width` x `height` sits when fitted inside `box`, centred. */
-export function fitIn(box: { x: number; y: number; width: number; height: number }, width: number, height: number) {
-  const scale = Math.min(box.width / width, box.height / height)
+/** Where a picture of `width` x `height` sits when fitted inside `box`, centred, scaled by at most `max`. */
+export function fitIn(box: { x: number; y: number; width: number; height: number }, width: number, height: number, max = Infinity) {
+  const scale = Math.min(box.width / width, box.height / height, max)
   const w = width * scale
   const h = height * scale
   return { x: box.x + (box.width - w) / 2, y: box.y + (box.height - h) / 2, width: w, height: h }

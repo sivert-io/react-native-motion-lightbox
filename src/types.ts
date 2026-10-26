@@ -5,7 +5,7 @@ export interface LightboxItem {
   /** The full-size image, or the video file. */
   src: string
   alt?: string
-  /** Intrinsic size. Without it, the item is measured once it loads. */
+  /** Intrinsic size. The lightbox never draws it larger. Without it, the item is measured once it loads. */
   width?: number
   height?: number
   /** A video's still. */
