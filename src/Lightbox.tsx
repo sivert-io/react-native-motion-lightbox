@@ -169,7 +169,8 @@ function Viewer<T extends LightboxItem>({
   const natural = useNaturalSizes(items)
   const fitted = (i: number) => {
     const { width, height } = natural(items[i])
-    return fitIn(stage, width, height)
+    // Never past its own size: a small picture blown up is a blurry one.
+    return fitIn(stage, width, height, 1)
   }
 
   const track = useTrack({ count: n, step: W + 2 * GAP, start })

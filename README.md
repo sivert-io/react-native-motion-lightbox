@@ -123,7 +123,7 @@ const origin = (i: number) =>
 
 | Prop | |
 |---|---|
-| `items` | `{ kind: 'image' \| 'video', src, alt?, width?, height?, poster?, thumb?, focus?, zoom? }[]`. If you leave out `width` and `height`, an image is measured once it loads. |
+| `items` | `{ kind: 'image' \| 'video', src, alt?, width?, height?, poster?, thumb?, focus?, zoom? }[]`. If you leave out `width` and `height`, an image is measured once it loads. The lightbox shows each item at most at this size, so a small picture isn't blown up. |
 | `index`, `open` | Which item to show, and whether the lightbox is open. Change `index` while it's open and it moves there. |
 | `onClose` | Someone pressed close, swiped down or pressed back. Set `open` to `false` and it animates out. |
 | `onIndexChange(index)` | The item on screen changed. |
